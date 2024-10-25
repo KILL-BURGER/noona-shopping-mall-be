@@ -2,6 +2,7 @@ const User = require('../models/User');
 const userController = {};
 const bcrypt = require('bcryptjs');
 
+// 회원가입
 userController.createUser = async (req, res) => {
   try {
     const {email, password, name, level} = req.body;
@@ -30,6 +31,21 @@ userController.createUser = async (req, res) => {
 
   } catch (error) {
     res.status(400).json({status: "fail", error: error.message});
+  }
+};
+
+// 유저불러오기
+userController.getUser = async (req, res) => {
+  try {
+    const {userId} = req;
+    const user = await User.findById(userId);
+    if (user) {
+      res.status(200).json({status: 'success', user});
+    } else {
+      throw new Error('Invalid token');
+    }
+  } catch (error) {
+    res.status(400).json({status: 'error', error: error.message});
   }
 };
 

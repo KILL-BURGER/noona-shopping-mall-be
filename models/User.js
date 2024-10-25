@@ -34,13 +34,13 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
-userSchema.methods.generateToken = async () => {
+userSchema.methods.generateToken = async function () {
   return await jwt.sign(
-    {_id: this._id},
-    JWT_SECRET_KEY,
-    {expiresIn: "1d"}
+    {_id: this._id},              // this로 스키마의 _id 접근
+    JWT_SECRET_KEY,               // JWT 시크릿 키는 변수로 사용
+    {expiresIn: "1d"}             // 토큰 만료 시간 설정
   );
-}
+};
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

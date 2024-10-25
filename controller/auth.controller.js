@@ -1,7 +1,12 @@
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const User = require("../models/User");
 const bcrypt = require('bcryptjs');
 const authController = {};
 
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+
+// 이메일 로그인
 authController.loginWithEmail = async (req, res) => {
   try {
     const {email, password} = req.body;
@@ -12,11 +17,48 @@ authController.loginWithEmail = async (req, res) => {
       if (isMatch) {
         // token 만들기
         const token = await user.generateToken();
-        console.log('로그인 유저 ===>', user.name);
+        console.log('로그인 유저 이름 ===>', user.name);
         return res.status(200).json({status: 'success', user, token});
       }
     }
     throw new Error('다시 입력해주세요.');
+  } catch (error) {
+    res.status(400).json({status: 'fail', error: error.message});
+  }
+};
+
+// 토큰 유효성 검증
+authController.authenticate = async (req, res, next) => {
+  try {
+    const tokenString = req.headers.authorization;
+
+    if (!tokenString) {
+      throw new Error('Token not found');
+    }
+
+    const token = tokenString.replace("Bearer ", "");
+
+    // jwt 동기방식 처리.
+    const payload = jwt.verify(token, JWT_SECRET_KEY);
+
+    req.userId = payload._id;
+    next();
+
+  } catch (error) {
+    res.status(400).json({status: 'fail', error: error.message});
+  }
+};
+
+// 어드민 계정 검증
+authController.checkAdminPermission = async (req, res, next) => {
+  try {
+    // token
+    const {userId} = req;
+    const user = await User.findById(userId);
+    if (user.level !== 'admin') {
+      throw new Error('권한접근이 없습니다.');
+    }
+    next();
   } catch (error) {
     res.status(400).json({status: 'fail', error: error.message});
   }
