@@ -18,6 +18,7 @@ authController.loginWithEmail = async (req, res) => {
         // token 만들기
         const token = await user.generateToken();
         console.log('로그인 유저 이름 ===>', user.name);
+
         return res.status(200).json({status: 'success', user, token});
       }
     }
