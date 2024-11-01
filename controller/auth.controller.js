@@ -53,6 +53,7 @@ authController.loginWithGoogle = async (req, res) => {
     }
 
     const sessionToken = await user.generateToken();
+    console.log('로그인 유저 이름 ===>', user.name);
     res.status(200).json({status: 'success', user, token: sessionToken});
   } catch (error) {
     res.status(400).json({status: 'fail', error: error.message});
