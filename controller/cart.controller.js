@@ -49,8 +49,8 @@ cartController.deleteCartItem = async (req, res) => {
     const {userId} = req;
     const cart = await Cart.findOne({userId});
     cart.items = cart.items.filter((item) => !item._id.equals(id));
-
     await cart.save();
+
     res.status(200).json({status: 200, cartItemQty: cart.items.length});
   } catch (error) {
     res.status(400).json({status: "fail", error: error.message});
@@ -85,14 +85,14 @@ cartController.editCartItem = async (req, res) => {
 };
 cartController.getCartQty = async (req, res) => {
   try {
-    const { userId } = req;
-    const cart = await Cart.findOne({ userId: userId });
+    const {userId} = req;
+    const cart = await Cart.findOne({userId: userId});
     if (!cart) {
       throw new Error("카트에 물건이 없습니다.");
     }
-    res.status(200).json({ status: 200, qty: cart.items.length });
+    res.status(200).json({status: 200, qty: cart.items.length});
   } catch (error) {
-    return res.status(400).json({ status: "fail", error: error.message });
+    return res.status(400).json({status: "fail", error: error.message});
   }
 };
 
