@@ -118,18 +118,40 @@ productController.deleteProduct = async (req, res) => {
   }
 };
 
+// productController.checkStock = async (item) => {
+//   const product = await Product.findById(item.productId);
+//   if (product.stock[item.size] < item.qty) {
+//     return {isVerify: false, message: `${product.name}의 ${item.size}재고가 부족합니다.`};
+//   }
+//
+//   const newStock = {...product.stock};
+//   newStock[item.size] -= item.qty;
+//   product.stock = newStock;
+//
+//   await product.save();
+//   return {isVerify: true};
+// };
+
 productController.checkStock = async (item) => {
-  const product = await Product.findById(item.productId);
-  if (product.stock[item.size] < item.qty) {
-    return {isVerify: false, message: `${product.name}의 ${item.size}재고가 부족합니다.`};
+  try {
+    const product = await Product.findById(item.productId);
+
+    if (!product) {
+      return { isVerify: false, message: `상품 ID ${item.productId}를 찾을 수 없습니다.` };
+    }
+
+    if (!product.stock[item.size] || product.stock[item.size] < item.qty) {
+      return { isVerify: false, message: `${product.name}의 ${item.size} 재고가 부족합니다.` };
+    }
+
+    product.stock[item.size] -= item.qty;
+    await product.save();
+
+    return { isVerify: true };
+  } catch (error) {
+    console.error("재고 확인 중 오류 발생: ", error);
+    return { isVerify: false, message: "재고 확인 중 오류가 발생했습니다." };
   }
-
-  const newStock = {...product.stock};
-  newStock[item.size] -= item.qty;
-  product.stock = newStock;
-
-  await product.save();
-  return {isVerify: true};
 };
 
 productController.checkItemListStock = async (itemList) => {

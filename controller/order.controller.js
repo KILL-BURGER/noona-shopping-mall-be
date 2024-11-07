@@ -4,17 +4,45 @@ const randomStringGenerator = require("../utils/randomStringGenerator");
 const orderController = {};
 
 const PAGE_SIZE = 5;
+// orderController.createOrder = async (req, res) => {
+//   try {
+//     const {userId} = req;
+//     const {shipTo, contact, totalPrice, orderList} = req.body;
+//
+//     const insufficientStockItems = await productController.checkItemListStock(orderList);
+//     console.log('ins ==>', insufficientStockItems);
+//     if (insufficientStockItems.length > 0) {
+//       const errorMessage = insufficientStockItems
+//         .reduce((total, item) => total += item.message, "");
+//       throw new Error(errorMessage);
+//     }
+//
+//     const newOrder = new Order({
+//       userId,
+//       totalPrice,
+//       shipTo,
+//       contact,
+//       items: orderList,
+//       orderNum: randomStringGenerator(),
+//     });
+//
+//     await newOrder.save();
+//
+//     res.status(200).json({status: 'success', orderNum: newOrder.orderNum});
+//   } catch (error) {
+//     res.status(400).json({status: 'fail', error: error.message});
+//   }
+// };
 orderController.createOrder = async (req, res) => {
   try {
-    const {userId} = req;
-    const {shipTo, contact, totalPrice, orderList} = req.body;
+    const { userId } = req;
+    const { shipTo, contact, totalPrice, orderList } = req.body;
 
     const insufficientStockItems = await productController.checkItemListStock(orderList);
 
     if (insufficientStockItems.length > 0) {
-      const errorMessage = insufficientStockItems
-        .reduce((total, item) => total += item.message, "");
-      throw new Error(errorMessage);
+      const errorMessage = insufficientStockItems.reduce((total, item) => total + item.message, "");
+      return res.status(400).json({ status: 'fail', error: errorMessage });
     }
 
     const newOrder = new Order({
@@ -28,11 +56,14 @@ orderController.createOrder = async (req, res) => {
 
     await newOrder.save();
 
-    res.status(200).json({status: 'success', orderNum: newOrder.orderNum});
+    res.status(200).json({ status: 'success', orderNum: newOrder.orderNum });
   } catch (error) {
-    res.status(400).json({status: 'fail', error: error.message});
+    console.error("Order creation error: ", error);
+    res.status(400).json({ status: 'fail', error: '주문 처리 중 오류가 발생했습니다.' });
   }
 };
+
+
 orderController.getOrder = async (req, res) => {
   try {
     const {userId} = req;
