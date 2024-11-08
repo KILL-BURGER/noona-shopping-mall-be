@@ -3,7 +3,7 @@ const productController = require("./product.controller");
 const randomStringGenerator = require("../utils/randomStringGenerator");
 const orderController = {};
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 3;
 // orderController.createOrder = async (req, res) => {
 //   try {
 //     const {userId} = req;
@@ -35,14 +35,14 @@ const PAGE_SIZE = 5;
 // };
 orderController.createOrder = async (req, res) => {
   try {
-    const { userId } = req;
-    const { shipTo, contact, totalPrice, orderList } = req.body;
+    const {userId} = req;
+    const {shipTo, contact, totalPrice, orderList} = req.body;
 
     const insufficientStockItems = await productController.checkItemListStock(orderList);
 
     if (insufficientStockItems.length > 0) {
       const errorMessage = insufficientStockItems.reduce((total, item) => total + item.message, "");
-      return res.status(400).json({ status: 'fail', error: errorMessage });
+      return res.status(400).json({status: 'fail', error: errorMessage});
     }
 
     const newOrder = new Order({
@@ -56,10 +56,10 @@ orderController.createOrder = async (req, res) => {
 
     await newOrder.save();
 
-    res.status(200).json({ status: 'success', orderNum: newOrder.orderNum });
+    res.status(200).json({status: 'success', orderNum: newOrder.orderNum});
   } catch (error) {
     console.error("Order creation error: ", error);
-    res.status(400).json({ status: 'fail', error: '주문 처리 중 오류가 발생했습니다.' });
+    res.status(400).json({status: 'fail', error: '주문 처리 중 오류가 발생했습니다.'});
   }
 };
 
@@ -106,7 +106,7 @@ orderController.getOrderList = async (req, res) => {
     const totalItemNum = await Order.find(cond).countDocuments();
     const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
 
-    res.status(200).json({status: 'success', data: orderList, totalPageNum});
+    res.status(200).json({status: 'success', data: orderList, totalPageNum: totalPageNum});
   } catch (error) {
     res.status(400).json({status: 'fail', error: error.message});
   }
