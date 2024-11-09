@@ -4,35 +4,6 @@ const randomStringGenerator = require("../utils/randomStringGenerator");
 const orderController = {};
 
 const PAGE_SIZE = 3;
-// orderController.createOrder = async (req, res) => {
-//   try {
-//     const {userId} = req;
-//     const {shipTo, contact, totalPrice, orderList} = req.body;
-//
-//     const insufficientStockItems = await productController.checkItemListStock(orderList);
-//     console.log('ins ==>', insufficientStockItems);
-//     if (insufficientStockItems.length > 0) {
-//       const errorMessage = insufficientStockItems
-//         .reduce((total, item) => total += item.message, "");
-//       throw new Error(errorMessage);
-//     }
-//
-//     const newOrder = new Order({
-//       userId,
-//       totalPrice,
-//       shipTo,
-//       contact,
-//       items: orderList,
-//       orderNum: randomStringGenerator(),
-//     });
-//
-//     await newOrder.save();
-//
-//     res.status(200).json({status: 'success', orderNum: newOrder.orderNum});
-//   } catch (error) {
-//     res.status(400).json({status: 'fail', error: error.message});
-//   }
-// };
 orderController.createOrder = async (req, res) => {
   try {
     const {userId} = req;
@@ -62,8 +33,6 @@ orderController.createOrder = async (req, res) => {
     res.status(400).json({status: 'fail', error: '주문 처리 중 오류가 발생했습니다.'});
   }
 };
-
-
 orderController.getOrder = async (req, res) => {
   try {
     const {userId} = req;
@@ -106,12 +75,11 @@ orderController.getOrderList = async (req, res) => {
     const totalItemNum = await Order.find(cond).countDocuments();
     const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
 
-    res.status(200).json({status: 'success', data: orderList, totalPageNum: totalPageNum});
+    res.status(200).json({status: 'success', data: orderList, totalPageNum});
   } catch (error) {
     res.status(400).json({status: 'fail', error: error.message});
   }
 };
-
 orderController.updateOrder = async (req, res) => {
   try {
     const {id} = req.params;

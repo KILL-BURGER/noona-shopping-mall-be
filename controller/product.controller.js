@@ -118,20 +118,6 @@ productController.deleteProduct = async (req, res) => {
   }
 };
 
-// productController.checkStock = async (item) => {
-//   const product = await Product.findById(item.productId);
-//   if (product.stock[item.size] < item.qty) {
-//     return {isVerify: false, message: `${product.name}의 ${item.size}재고가 부족합니다.`};
-//   }
-//
-//   const newStock = {...product.stock};
-//   newStock[item.size] -= item.qty;
-//   product.stock = newStock;
-//
-//   await product.save();
-//   return {isVerify: true};
-// };
-
 productController.checkStock = async (item) => {
   try {
     const product = await Product.findById(item.productId);
@@ -139,10 +125,6 @@ productController.checkStock = async (item) => {
     if (!product) {
       return {isVerify: false, message: `상품 ID ${item.productId}를 찾을 수 없습니다.`};
     }
-
-    // if (!product.stock[item.size] || product.stock[item.size] < item.qty) {
-    //   return {isVerify: false, message: `${product.name}의 ${item.size} 재고가 부족합니다.`};
-    // }
 
     // 상품의 해당 사이즈 재고가 존재하는지 및 수량이 충분한지 확인
     if (!product.stock || !product.stock[item.size] || product.stock[item.size] < item.qty) {
@@ -152,12 +134,6 @@ productController.checkStock = async (item) => {
     // 재고를 업데이트하여 바로 product에 반영
     product.stock[item.size] -= item.qty;
 
-    // console.log('product.stock ==> ', product.stock);
-    // console.log('product.stock[item.size] ==> ', product.stock[item.size]);
-    // const newStock = {...product.stock};
-    // newStock[item.size] -= item.qty;
-    // product.stock = newStock;
-    // product.stock[item.size] -= item.qty;
     await product.save();
 
     return {isVerify: true};
@@ -181,6 +157,14 @@ productController.checkItemListStock = async (itemList) => {
   );
 
   return insufficientStockItems;
+};
+
+productController.getProductByProductId = async (productId) => {
+  const target = await Product.findById(productId);
+  if (!target) {
+    throw new Error('상품이 없습니다.');
+  }
+  return target;
 };
 
 module.exports = productController;
